@@ -1,0 +1,52 @@
+#include <cmath>
+#include <iostream>
+
+// Define a Bond class with the following attributes:
+// - price: the price of the bond
+// - coupon: the annual coupon payment (as a percentage of the bond's face value)
+// - maturity: the number of years until the bond matures
+// - face_value: the face value of the bond (the amount that will be paid at maturity)
+class Bond {
+ public:
+  double price;
+  double coupon;
+  int maturity;
+  double face_value;
+
+  // Constructor for the Bond class
+  Bond(double price_, double coupon_, int maturity_, double face_value_)
+      : price(price_),
+        coupon(coupon_),
+        maturity(maturity_),
+        face_value(face_value_) {}
+};
+
+// Function to calculate the price of a bond using the discounted cash flow (DCF) method
+double price_bond(const Bond& bond, double yield) {
+  double pv = 0.0;  // present value
+  for (int i = 1; i <= bond.maturity; ++i) {
+    // Calculate the present value of the coupon payment at time i
+    pv += bond.coupon * bond.face_value / yield / pow(1.0 + yield, i);
+  }
+  // Calculate the present value of the face value at maturity
+  pv += bond.face_value / pow(1.0 + yield, bond.maturity);
+  return pv;
+}
+
+int main() {
+  // Create a bond with a price of 100, coupon of 5%, maturity of 10 years, and face value of 1000
+  Bond bond(100, 0.05, 10, 1000);
+
+  // Calculate the bond's yield to maturity
+  double yield = 0.0;
+  double pv = price_bond(bond, yield);
+  while (pv > bond.price) {
+    yield += 0.0001;  // increment yield by 0.01%
+    pv = price_bond(bond, yield);
+  }
+
+  std::cout << "Yield to maturity: " << yield << std::endl;
+  std::cout << "Price of bond: " << pv << std::endl;
+
+  return 0;
+}
